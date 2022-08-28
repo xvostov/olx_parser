@@ -74,6 +74,9 @@ class OlxParser:
 
             soup = BeautifulSoup(content, 'lxml')
             all_cards = soup.find_all('div', {'data-cy': 'l-card'})
+            if len(all_cards) == 0:
+                break
+
             logger.debug(f'Cards found on the page: {len(all_cards)}')
             for card in all_cards:
                 offer_url = card.find('a').get('href')

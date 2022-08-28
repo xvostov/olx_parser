@@ -21,7 +21,7 @@ class Requester:
 
     def get(self, url):
         for i in range(2):
-            resp = self.session.get(url, timeout=5, allow_redirects=True)
+            resp = self.session.get(url, timeout=5, allow_redirects=False)
 
             if resp.status_code == 502:
                 raise EmptyPageException
