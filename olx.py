@@ -62,6 +62,7 @@ class OlxParser:
         urls_list = []
 
         for page_num in range(1, 9999):
+
             logger.info(f'Trying to parse page {page_num}')
             page_url = re.sub(r'&page=\d{0,3}', '', url) + f'&page={page_num}'
 
@@ -73,6 +74,7 @@ class OlxParser:
                 break
 
             soup = BeautifulSoup(content, 'lxml')
+
             all_cards = soup.find_all('div', {'class': 'offer-wrapper'})
             if len(all_cards) == 0:
                 break
@@ -80,7 +82,7 @@ class OlxParser:
             logger.debug(f'Cards found on the page: {len(all_cards)}')
             for card in all_cards:
                 offer_url = card.find_all('a')[0].get('href')
-                urls_list.append('https://www.olx.kz' + offer_url)
+                urls_list.append(offer_url)
             time.sleep(1)
 
         logger.debug(f'Url found: {len(urls_list)}')
