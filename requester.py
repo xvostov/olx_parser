@@ -23,11 +23,15 @@ class Requester:
         for i in range(2):
             resp = self.session.get(url, timeout=5, allow_redirects=True)
             if "page=" in url:
+                print(url)
                 request_num_page = int(url.split('page=')[1])
-                response_num_page = int(re.search(r'page=[1-9][0-9]?', resp.url).group(0).replace('page=', ''))
-
-                if response_num_page < request_num_page:
-                    raise EmptyPageException
+                try:
+                    response_num_page = int(re.search(r'page=[1-9][0-9]?', resp.url).group(0).replace('page=', ''))
+                except:
+                    pass
+                else:
+                    if response_num_page < request_num_page:
+                        raise EmptyPageException
 
             if resp.status_code == 502:
                 raise EmptyPageException
