@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import HTTPError
 from loguru import logger
 from exceptions import EmptyPageException
-
+import re
 
 def save_html(content):
     with open('test.html', 'w', encoding='utf') as f:
@@ -24,7 +24,8 @@ class Requester:
             resp = self.session.get(url, timeout=5, allow_redirects=True)
             if "page=" in url:
                 request_num_page = int(url.split('page=')[1])
-                response_num_page = int(resp.url.split('page=')[1])
+                response_num_page = int(re.search(r'page=[1-9][0-9]?', resp.url).group(0).replace('page=', ''))
+
                 if response_num_page < request_num_page:
                     raise EmptyPageException
 
