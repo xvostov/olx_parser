@@ -73,13 +73,13 @@ class OlxParser:
                 break
 
             soup = BeautifulSoup(content, 'lxml')
-            all_cards = soup.find_all('div', {'data-cy': 'l-card'})
+            all_cards = soup.find_all('div', {'class': 'offer-wrapper'})
             if len(all_cards) == 0:
                 break
 
             logger.debug(f'Cards found on the page: {len(all_cards)}')
             for card in all_cards:
-                offer_url = card.find('a').get('href')
+                offer_url = card.find_all('a')[0].get('href')
                 urls_list.append('https://www.olx.kz' + offer_url)
             time.sleep(1)
 

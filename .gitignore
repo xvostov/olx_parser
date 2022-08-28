@@ -144,4 +144,6 @@ settings.ini
 .idea
 __pychache__/
 Dockerfile
+docker-compose.yml
 
+!/test.py
