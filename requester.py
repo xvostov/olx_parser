@@ -21,7 +21,12 @@ class Requester:
 
     def get(self, url):
         for i in range(2):
-            resp = self.session.get(url, timeout=5, allow_redirects=False)
+            resp = self.session.get(url, timeout=5, allow_redirects=True)
+            if "page=" in url:
+                request_num_page = int(url.split('page=')[1])
+                response_num_page = int(resp.url.split('page=')[1])
+                if response_num_page < request_num_page:
+                    raise EmptyPageException
 
             if resp.status_code == 502:
                 raise EmptyPageException
@@ -33,25 +38,18 @@ class Requester:
                 logger.error(f'[{resp.status_code}] {url} - invalid server response')
                 time.sleep(300)
             else:
-                logger.debug(f'{url} - html received, status code: {resp.status_code}')
+                # logger.debug(f'{url} - html received, status code: {resp.status_code}')
                 break
 
-            save_html(resp.text)
-
+        save_html(resp.text)
         return resp.text
 
 
 def main():
-    url = 'https://www.olx.kz/d/moda-i-stil/naruchnye-chasy/alma-ata/?search%5Bdistrict_id%5D=5&search%5Bprivate_business%5D=private&page=1'
-
     req = Requester('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36')
-
-    resp = req.get(url)
-
-    with open('test.html', 'w', encoding='utf-8') as f:
-        f.write(resp)
-
-    print(resp)
+    for i in range(1, 99999):
+        url = f'https://www.olx.kz/d/moda-i-stil/naruchnye-chasy/alma-ata/?search%5Bdistrict_id%5D=5&search%5Bprivate_business%5D=private&page={i}'
+        resp = req.get(url)
 
 if __name__ == '__main__':
     main()
