@@ -81,7 +81,7 @@ class OlxParser:
 
             logger.debug(f'Cards found on the page: {len(all_cards)}')
             for card in all_cards:
-                offer_url = card.find_all('a')[0].get('href')
+                offer_url = card.find_all('a')[0].get('href').split('.html#')[0] + '.html'
                 urls_list.append(offer_url)
             time.sleep(1)
 
