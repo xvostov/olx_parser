@@ -13,14 +13,26 @@ def save_html(content):
 
 class Requester:
     def __init__(self, ua):
-        self.session = requests.Session()
-        self.session.headers = {'User-Agent': ua,
+        self.headers = {'User-Agent': ua,
                                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                                 # 'cookies': cookie
                                 }
 
+        self.session = self.create_session()
+
+    def create_session(self):
+        session = requests.Session()
+        session.headers = self.headers
+        return session
+
     def get(self, url):
-        resp = self.session.get(url, timeout=5, allow_redirects=True)
+        try:
+            resp = self.session.get(url, timeout=5, allow_redirects=True)
+        except requests.exceptions.ConnectionError:
+            self.session.close()
+            time.sleep(60)
+            self.session = self.create_session()
+
         if "page=" in url:
             print(url)
             request_num_page = int(url.split('page=')[1])
