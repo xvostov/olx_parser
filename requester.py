@@ -20,34 +20,31 @@ class Requester:
                                 }
 
     def get(self, url):
-        for i in range(2):
-            resp = self.session.get(url, timeout=5, allow_redirects=True)
-            if "page=" in url:
-                print(url)
-                request_num_page = int(url.split('page=')[1])
-                try:
-                    response_num_page = int(re.search(r'page=[1-9][0-9]?', resp.url).group(0).replace('page=', ''))
-                except:
-                    pass
-                else:
-                    if response_num_page < request_num_page:
-                        raise EmptyPageException
-
-            if resp.status_code == 502:
-                raise EmptyPageException
-
+        resp = self.session.get(url, timeout=5, allow_redirects=True)
+        if "page=" in url:
+            print(url)
+            request_num_page = int(url.split('page=')[1])
             try:
-                resp.raise_for_status()
-
-            except HTTPError:
-                logger.error(f'[{resp.status_code}] {url} - invalid server response')
-                time.sleep(300)
+                response_num_page = int(re.search(r'page=[1-9][0-9]?', resp.url).group(0).replace('page=', ''))
+            except:
+                pass
             else:
-                # logger.debug(f'{url} - html received, status code: {resp.status_code}')
-                break
+                if response_num_page < request_num_page:
+                    raise EmptyPageException
 
-        save_html(resp.text)
-        return resp.text
+        if resp.status_code == 502:
+            raise EmptyPageException
+
+        try:
+            resp.raise_for_status()
+
+        except HTTPError:
+            logger.error(f'[{resp.status_code}] {url} - invalid server response')
+            time.sleep(300)
+        else:
+            # logger.debug(f'{url} - html received, status code: {resp.status_code}')
+            save_html(resp.text)
+            return resp.text
 
 
 def main():
