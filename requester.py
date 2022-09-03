@@ -32,6 +32,7 @@ class Requester:
             self.session.close()
             time.sleep(60)
             self.session = self.create_session()
+            resp = self.session.get(url, timeout=5, allow_redirects=True)
 
         if "page=" in url:
             print(url)
