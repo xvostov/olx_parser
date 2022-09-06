@@ -20,7 +20,7 @@ class DataBase:
 
         self.connection.execute("""
         CREATE TABLE IF NOT EXISTS black_list (
-        id	TEXT NOT NULL UNIQUE)""")
+        user_id	TEXT NOT NULL UNIQUE)""")
 
         self.connection.execute("""
         CREATE TABLE IF NOT EXISTS categories (
@@ -94,7 +94,7 @@ class DataBase:
     def add_to_blacklist(self, user_id: str):
         logger.debug('Adding id in blacklist..')
         try:
-            self.cursor.execute("INSERT INTO id VALUES(?)", (user_id,))
+            self.cursor.execute("INSERT INTO black_list VALUES(?)", (user_id,))
         except IntegrityError:
             logger.error('Failed to add id in blacklist')
 
@@ -104,11 +104,11 @@ class DataBase:
 
     def remove_from_blacklist(self, user_id: str):
         logger.debug('Removing id from blacklist..')
-        self.cursor.execute("DELETE FROM black_list WHERE id == ?", (user_id,))
+        self.cursor.execute("DELETE FROM black_list WHERE user_id == ?", (user_id,))
         self.connection.commit()
         logger.debug('Id has been removed from blacklist')
 
     def get_blacklist(self) -> List:
         logger.debug('Getting ids from black_list')
-        resp = self.cursor.execute("SELECT id FROM black_list").fetchall()
+        resp = self.cursor.execute("SELECT user_id FROM black_list").fetchall()
         return [d[0] for d in resp]
