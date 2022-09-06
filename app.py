@@ -96,7 +96,7 @@ def get_stopwords():
     requests_token = request_json.get('token', '')
 
     if requests_token == api_parser_token:
-        return jsonify({'categories': db.get_stopwords()}), 200
+        return jsonify({'words': db.get_stopwords()}), 200
     else:
         return jsonify({'status': 'access denied'}), 401
 
@@ -138,7 +138,7 @@ def get_blacklist():
     requests_token = request_json.get('token', '')
 
     if requests_token == api_parser_token:
-        return jsonify({'categories': db.get_blacklist()}), 200
+        return jsonify({'ids': db.get_blacklist()}), 200
     else:
         return jsonify({'status': 'access denied'}), 401
 
