@@ -94,7 +94,7 @@ class DataBase:
     def add_to_blacklist(self, user_id: str):
         logger.debug('Adding id in blacklist..')
         try:
-            self.cursor.execute("INSERT INTO stop_words VALUES(?)", (user_id,))
+            self.cursor.execute("INSERT INTO id VALUES(?)", (user_id,))
         except IntegrityError:
             logger.error('Failed to add id in blacklist')
 
