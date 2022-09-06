@@ -86,7 +86,7 @@ class DataBase:
 
     def get_stopwords(self) -> List:
         logger.debug('Getting stopwords from db')
-        resp = self.cursor.execute("SELECT id FROM stop_words").fetchall()
+        resp = self.cursor.execute("SELECT word FROM stop_words").fetchall()
         return [d[0] for d in resp]
 
 #======================
