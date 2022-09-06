@@ -6,3 +6,7 @@ class EmptyPageException(Exception):
 
 class MissingPhotoException(Exception):
     pass
+
+
+class UnsuitableProductError(Exception):
+    pass

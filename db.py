@@ -14,27 +14,17 @@ class DataBase:
         CREATE TABLE IF NOT EXISTS viewed_links (
         url	TEXT NOT NULL UNIQUE)""")
 
-        # self.connection.execute("""
-        # CREATE TABLE IF NOT EXISTS offers (
-        # url TEXT NOT NULL,
-        # title TEXT,
-        # id TEXT,
-        # price TEXT,
-        # description TEXT,
-        # img_url TEXT,
-        # PRIMARY KEY("url"))""")
+        self.connection.execute("""
+        CREATE TABLE IF NOT EXISTS stop_words (
+        word	TEXT NOT NULL UNIQUE)""")
+
+        self.connection.execute("""
+        CREATE TABLE IF NOT EXISTS black_list (
+        id	TEXT NOT NULL UNIQUE)""")
 
         self.connection.execute("""
         CREATE TABLE IF NOT EXISTS categories (
         url	TEXT NOT NULL UNIQUE)""")
-
-    # def add_offer(self, offer: Offer):
-    #     logger.debug('Adding offer in db..')
-    #     request = "INSERT INTO offers VALUES(?,)"
-    #     # self.cursor.execute(request, (offer.url, offer.title, offer.id, offer.price, offer.description, offer.img_url))
-    #     self.cursor.execute(request, (offer.url,))
-    #     self.connection.commit()
-    #     logger.debug('Offer has been added')
 
     def add_to_viewed_links(self, url: str):
         logger.debug('Adding viewed url in db..')
@@ -76,3 +66,49 @@ class DataBase:
     def close(self):
         logger.debug('Closing connection')
         self.connection.close()
+
+    def add_stopword(self, word: str):
+        logger.debug('Adding stopword in db..')
+        try:
+            self.cursor.execute("INSERT INTO stop_words VALUES(?)", (word,))
+        except IntegrityError:
+            logger.error('Failed to add a stopword in db')
+
+        else:
+            logger.debug('Stopword has been added')
+            self.connection.commit()
+
+    def remove_stopword(self, word: str):
+        logger.debug('Removing a stopword from db..')
+        self.cursor.execute("DELETE FROM stop_words WHERE word == ?", (word,))
+        self.connection.commit()
+        logger.debug('Category has been removed')
+
+    def get_stopwords(self) -> List:
+        logger.debug('Getting stopwords from db')
+        resp = self.cursor.execute("SELECT id FROM stop_words").fetchall()
+        return [d[0] for d in resp]
+
+#======================
+
+    def add_to_blacklist(self, user_id: str):
+        logger.debug('Adding id in blacklist..')
+        try:
+            self.cursor.execute("INSERT INTO stop_words VALUES(?)", (user_id,))
+        except IntegrityError:
+            logger.error('Failed to add id in blacklist')
+
+        else:
+            logger.debug('Id has been added in blacklist')
+            self.connection.commit()
+
+    def remove_from_blacklist(self, user_id: str):
+        logger.debug('Removing id from blacklist..')
+        self.cursor.execute("DELETE FROM black_list WHERE id == ?", (user_id,))
+        self.connection.commit()
+        logger.debug('Id has been removed from blacklist')
+
+    def get_blacklist(self) -> List:
+        logger.debug('Getting ids from black_list')
+        resp = self.cursor.execute("SELECT id FROM black_list").fetchall()
+        return [d[0] for d in resp]

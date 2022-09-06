@@ -6,7 +6,7 @@ import api
 from offer import Offer
 from loader import requester, db
 from bs4 import BeautifulSoup
-from exceptions import EmptyPageException, MissingPhotoException
+from exceptions import EmptyPageException, MissingPhotoException, UnsuitableProductError
 
 import re
 
@@ -22,6 +22,14 @@ class OlxParser:
         logger.debug(f'{url} - parsing..')
         content = self.requester.get(url)
         soup = BeautifulSoup(content, 'lxml')
+
+        seller_id = soup.find_all('a', {'href': re.compile('^/d/list/user/')})[0].get('href')
+        seller_id = seller_id.replace('/d/list/user/', '').replace('/', '').strip()
+
+        for user_id in db.get_blacklist():
+            if user_id == seller_id:
+                raise UnsuitableProductError
+
 
         offer = Offer()
         offer.url = url
@@ -40,6 +48,11 @@ class OlxParser:
         raw_description = soup.find_all('div', {'data-cy': 'ad_description'})[0].text.replace('Описание', '').strip()
         offer.description = re.sub(self.html_cleaner, '', raw_description)
         logger.debug('description - OK')
+
+        for stop_word in db.get_stopwords():
+            if stop_word in offer.title or stop_word in offer.description:
+                logger.debug(f'stopword: {stop_word} was found')
+                raise UnsuitableProductError
 
         logger.debug('price - parsing..')
         offer.price = soup.find_all('div', {'data-testid': 'ad-price-container'})[0].text
@@ -107,11 +120,13 @@ class OlxParser:
         for url in urls_list:
             try:
                 offer = self.get_offer(url)
+            except UnsuitableProductError:
+                logger.warning(f'{url} - will be skipped')
+            except MissingPhotoException:
+                logger.warning(f'{url} - will be skipped')
+
+            else:
                 api.send_offer(offer)
                 if offer.url not in db.get_urls():
                     db.add_to_viewed_links(offer.url)
-            except MissingPhotoException:
-                logger.warning(f'{url} - will be skipped')
-                time.sleep(1)
-
             time.sleep(5)
