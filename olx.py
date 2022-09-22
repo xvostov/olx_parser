@@ -88,7 +88,7 @@ class OlxParser:
 
             soup = BeautifulSoup(content, 'lxml')
 
-            all_cards = soup.find_all('div', {'data-cy': 'l-card'})
+            all_cards = soup.find_all('div', {'class': 'offer-wrapper'})
             if len(all_cards) == 0:
                 break
 
